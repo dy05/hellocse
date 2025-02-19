@@ -5,10 +5,17 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\AdministratorFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @property int|null $id
+ * @property string|null $name
+ * @property string|null $email
+ * @property Profil[] $profiles
+ */
 class Administrator extends Authenticatable
 {
     /** @use HasFactory<AdministratorFactory> */
@@ -35,6 +42,10 @@ class Administrator extends Authenticatable
         'remember_token',
     ];
 
+    protected $with = [
+        'profiles',
+    ];
+
     /**
      * Get the attributes that should be cast.
      *
@@ -46,5 +57,13 @@ class Administrator extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function profiles(): HasMany
+    {
+        return $this->hasMany(Profil::class, 'user_id');
     }
 }

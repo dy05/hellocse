@@ -7,14 +7,50 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ProfilRequest;
 use App\Models\Profil;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use OpenApi\Annotations as OA;
 use Storage;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/api/user",
+     *     security={{"bearerAuth": {}}},
+     *     tags={"Administrators"},
+     *     summary="Get administrator information",
+     *     description="Returns administrator data",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/Administrator")
+     *     ),
+     *     @OA\Response(response=403, description="Unauthorized")
+     * )
+     */
+    public function user(Request $request)
+    {
+        return response()->json([
+            'user' => $request->user()
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/users",
+     *     summary="Retrieve a list of active profiles",
+     *     tags={"Profiles"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="A list of active profiles",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Profil")
+     *         )
+     *     )
+     * )
      */
     public function index()
     {
@@ -26,7 +62,21 @@ class UserController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/api/users",
+     *     security={{"bearerAuth": {}}},
+     *     summary="Create a new profile",
+     *     tags={"Profiles"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/ProfilRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Profile created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Profil")
+     *     )
+     * )
      */
     public function store(ProfilRequest $request)
     {
@@ -36,7 +86,28 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/api/users/{id}",
+     *     security={{"bearerAuth": {}}},
+     *     summary="Retrieve a specific profile",
+     *     tags={"Profiles"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID of the profile to retrieve",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profile retrieved successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Profil")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Profile not found"
+     *     )
+     * )
      */
     public function show(Profil $user)
     {
@@ -44,7 +115,36 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/users/{id}",
+     *     security={{"bearerAuth": {}}},
+     *     summary="Update an existing profile",
+     *     tags={"Profiles"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID of the profile to update",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/ProfilRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profile updated successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Profil")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Profile not found"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Failed to update profile"
+     *     )
+     * )
      */
     public function update(ProfilRequest $request, Profil $user)
     {
@@ -61,7 +161,35 @@ class UserController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/users/{id}",
+     *     summary="Delete a profile",
+     *     security={{"bearerAuth": {}}},
+     *     tags={"Profiles"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID of the profile to delete",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profile deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Profil successfully deleted!")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Profile not found"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Failed to delete profile"
+     *     )
+     * )
      */
     public function destroy(Profil $user)
     {

@@ -12,11 +12,7 @@ Route::group(['prefix' => '/auth'], function () {
 });
 
 
-Route::get('/user', function (Request $request) {
-    return response()->json([
-        'user' => $request->user()
-    ]);
-})->middleware('auth:sanctum');
+Route::get('/user', [UserController::class, 'user'])->middleware('auth:sanctum');
 
 Route::get('/users', [UserController::class, 'index']);
 

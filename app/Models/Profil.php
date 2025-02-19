@@ -8,10 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
+ * @property int|null $id
  * @property string|null $firstname
  * @property string|null $lastname
  * @property string|null $picture
  * @property string|null $status
+ * @property int|null $user_id
+ * @property Administrator|null $administrator
  */
 class Profil extends Model
 {

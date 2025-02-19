@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Profil;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class ProfilSeeder extends Seeder
