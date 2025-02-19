@@ -2,10 +2,10 @@
 
 namespace Database\Factories;
 
+use Alirezasedghi\LaravelImageFaker\ImageFaker;
 use Alirezasedghi\LaravelImageFaker\Services\Picsum;
 use App\Models\Profil;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use AlirezaSedghi\LaravelImageFaker\ImageFaker;
 
 /**
  * @extends Factory<Profil>
@@ -28,4 +28,14 @@ class ProfilFactory extends Factory
             'picture' => $imageFaker->imageUrl(400, 400)
         ];
     }
+
+    public function withUser($userId): static
+    {
+        return $this->state(function (array $attributes) use ($userId) {
+            return [
+                'user_id' => $userId
+            ];
+        });
+    }
+
 }

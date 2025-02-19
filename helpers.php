@@ -17,7 +17,7 @@ if (! function_exists('getProfilStatuses')) {
 }
 
 if (! function_exists('getProfilStatus')) {
-    function getProfilStatus(int $id): ProfilStatusEnum|null
+    function getProfilStatus(int $id): string|null
     {
         $statuses = getProfilStatuses();
         if ($id < count($statuses)) {
