@@ -8,6 +8,7 @@ use App\Http\Requests\ProfilRequest;
 use App\Models\Profil;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Storage;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
@@ -65,7 +66,17 @@ class UserController extends Controller
     public function destroy(Profil $user)
     {
         try {
+            $picture = $user->getAttributes()['picture'];
+            $userPicture = $user->picture;
             $user->delete();
+
+            // Delete picture if it exists in storage
+            // Do this after deleted profil, in case exception thrown when deleting profile
+            // We can also implement it when changing picture in getDatas method
+            if ($userPicture !== $picture && Storage::disk('public')->exists($picture)) {
+                Storage::disk('public')->delete($picture);
+            }
+
             return response()->json(['message' => 'Profil successfully deleted !']);
         } catch (Exception $exc) {
             Log::error(self::class, ['message' => $exc->getMessage(), 'exc' => $exc]);
