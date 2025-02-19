@@ -34,7 +34,8 @@ class AuthController extends Controller implements HasMiddleware
      *             required={"name", "email", "password"},
      *             @OA\Property(property="name", type="string", example="John Doe"),
      *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="secret")
+     *             @OA\Property(property="password", type="string", format="password", example="secret"),
+     *             @OA\Property(property="password_confirmation", type="string", format="password", example="secret")
      *         )
      *     ),
      *     @OA\Response(
@@ -66,7 +67,7 @@ class AuthController extends Controller implements HasMiddleware
             return response()->json([
                 'message' => 'User created successfully !',
                 'user' => $admin,
-                'token' => $admin->createToken('user' . $admin->id . '-' . $request->userAgent()),
+                'token' => $admin->createToken('user' . $admin->id . '-' . $request->userAgent())->plainTextToken,
             ], 201);
         } catch (Exception $exc) {
             return response()->json(['error' => $exc->getMessage()], 500);
@@ -119,7 +120,7 @@ class AuthController extends Controller implements HasMiddleware
         return response()->json([
             'message' => 'User login successfully !',
             'user' => $admin,
-            'token' => $admin->createToken('user' . $admin->id . '-' . $request->userAgent()),
+            'token' => $admin->createToken('user' . $admin->id . '-' . $request->userAgent())->plainTextToken,
         ]);
     }
 
@@ -128,7 +129,7 @@ class AuthController extends Controller implements HasMiddleware
      *     path="/api/auth/logout",
      *     summary="Logout the authenticated administrator",
      *     tags={"Authentication"},
-     *     security={{"bearerAuth": {}}},
+     *     security={{"sanctum": {}}},
      *     @OA\Response(
      *         response=200,
      *         description="User logged out successfully",

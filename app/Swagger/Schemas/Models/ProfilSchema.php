@@ -51,6 +51,7 @@ class ProfilSchema
      */
     public string $lastname;
 
+
     /**
      * @OA\Property(
      *     title="Picture",
@@ -66,7 +67,7 @@ class ProfilSchema
      * @OA\Property(
      *     title="Status",
      *     description="Status of the profil",
-     *     example="active"
+     *     example="actif"
      * )
      *
      * @var string
@@ -88,6 +89,7 @@ class ProfilSchema
     /**
      * @OA\Property(
      *     title="Administrator",
+     *     ref="#/components/schemas/Administrator",
      *     description="Administrator related to the profil"
      * )
      *

@@ -11,7 +11,7 @@ use SplFileInfo;
  *     description="Request body data for creating or updating a Profil",
  *     schema="ProfilRequest",
  *     type="object",
- *     required={"firstname", "lastname"}
+ *     required={"firstname", "lastname", "status", "picture"}
  * )
  */
 class ProfilRequestSchema
@@ -42,7 +42,8 @@ class ProfilRequestSchema
      * @OA\Property(
      *     title="Status",
      *     description="The status of the profile",
-     *     example="active"
+     *     enum={"actif", "inatif", "en attente"},
+     *     example="actif"
      * )
      *
      * @var string

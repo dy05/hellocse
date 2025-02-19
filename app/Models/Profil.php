@@ -29,10 +29,6 @@ class Profil extends Model
         'user_id',
     ];
 
-    protected $with = [
-        'administrator',
-    ];
-
     public function getPictureAttribute($value): ?string
     {
         if (str_contains($value, "http://") || str_contains($value, "https://")) {

@@ -18,7 +18,7 @@ class UserController extends Controller
     /**
      * @OA\Get(
      *     path="/api/user",
-     *     security={{"bearerAuth": {}}},
+     *     security={{"sanctum": {}}},
      *     tags={"Administrators"},
      *     summary="Get administrator information",
      *     description="Returns administrator data",
@@ -33,7 +33,7 @@ class UserController extends Controller
     public function user(Request $request)
     {
         return response()->json([
-            'user' => $request->user()
+            'user' => $request->user()->load(['profiles'])
         ]);
     }
 
@@ -55,6 +55,7 @@ class UserController extends Controller
     public function index()
     {
         $profils = Profil::query()
+            ->with(['administrator'])
             ->where(['status' => ProfilStatusEnum::ACTIF->value])
             ->get();
 
@@ -64,12 +65,17 @@ class UserController extends Controller
     /**
      * @OA\Post(
      *     path="/api/users",
-     *     security={{"bearerAuth": {}}},
+     *     security={{"sanctum": {}}},
      *     summary="Create a new profile",
      *     tags={"Profiles"},
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/ProfilRequest")
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 ref="#/components/schemas/ProfilRequest"
+     *             )
+     *         )
      *     ),
      *     @OA\Response(
      *         response=201,
@@ -82,13 +88,14 @@ class UserController extends Controller
     {
         $data = $this->getDatas($request);
         $profil = Profil::query()->create($data);
+        $profil = $profil->load(['administrator']);
         return response()->json(['profil' => $profil], Response::HTTP_CREATED);
     }
 
     /**
      * @OA\Get(
      *     path="/api/users/{id}",
-     *     security={{"bearerAuth": {}}},
+     *     security={{"sanctum": {}}},
      *     summary="Retrieve a specific profile",
      *     tags={"Profiles"},
      *     @OA\Parameter(
@@ -111,13 +118,14 @@ class UserController extends Controller
      */
     public function show(Profil $user)
     {
+        $user = $user->load(['administrator']);
         return response()->json(['profil' => $user]);
     }
 
     /**
-     * @OA\Put(
+     * @OA\Post(
      *     path="/api/users/{id}",
-     *     security={{"bearerAuth": {}}},
+     *     security={{"sanctum": {}}},
      *     summary="Update an existing profile",
      *     tags={"Profiles"},
      *     @OA\Parameter(
@@ -129,7 +137,25 @@ class UserController extends Controller
      *     ),
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/ProfilRequest")
+     *         description="Profil data to update profil",
+     *         @OA\MediaType(
+     *              mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  required={"_method"},
+     *                  allOf={
+     *                      @OA\Schema(ref="#/components/schemas/ProfilRequest"),
+     *                      @OA\Schema(
+     *                          @OA\Property(
+     *                              property="_method",
+     *                              type="string",
+     *                              enum={"PUT"},
+     *                              default="PUT",
+     *                              description="HTTP method override for update requests"
+     *                          )
+     *                      )
+     *                  }
+     *              )
+     *          )
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -151,7 +177,7 @@ class UserController extends Controller
         try {
             $data = $this->getDatas($request);
             $user->update($data);
-            $user = $user->fresh();
+            $user = $user->fresh(['administrator']);
 
             return response()->json(['profil' => $user]);
         } catch (Exception $exc) {
@@ -164,7 +190,7 @@ class UserController extends Controller
      * @OA\Delete(
      *     path="/api/users/{id}",
      *     summary="Delete a profile",
-     *     security={{"bearerAuth": {}}},
+     *     security={{"sanctum": {}}},
      *     tags={"Profiles"},
      *     @OA\Parameter(
      *         name="id",

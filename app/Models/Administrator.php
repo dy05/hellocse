@@ -42,10 +42,6 @@ class Administrator extends Authenticatable
         'remember_token',
     ];
 
-    protected $with = [
-        'profiles',
-    ];
-
     /**
      * Get the attributes that should be cast.
      *

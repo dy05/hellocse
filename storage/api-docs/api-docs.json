@@ -44,6 +44,11 @@
                                         "type": "string",
                                         "format": "password",
                                         "example": "secret"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret"
                                     }
                                 },
                                 "type": "object"
@@ -197,7 +202,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "sanctum": []
                     }
                 ]
             }
@@ -227,7 +232,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "sanctum": []
                     }
                 ]
             }
@@ -264,7 +269,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "$ref": "#/components/schemas/ProfilRequest"
                             }
@@ -285,7 +290,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "sanctum": []
                     }
                 ]
             }
@@ -325,16 +330,16 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "sanctum": []
                     }
                 ]
             },
-            "put": {
+            "post": {
                 "tags": [
                     "Profiles"
                 ],
                 "summary": "Update an existing profile",
-                "operationId": "b166772cec9714067040e77cf14beeba",
+                "operationId": "aa81151559ac4eeb9606336b205bfa3f",
                 "parameters": [
                     {
                         "name": "id",
@@ -347,11 +352,32 @@
                     }
                 ],
                 "requestBody": {
+                    "description": "Profil data to update profil",
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
-                                "$ref": "#/components/schemas/ProfilRequest"
+                                "required": [
+                                    "_method"
+                                ],
+                                "allOf": [
+                                    {
+                                        "$ref": "#/components/schemas/ProfilRequest"
+                                    },
+                                    {
+                                        "properties": {
+                                            "_method": {
+                                                "description": "HTTP method override for update requests",
+                                                "type": "string",
+                                                "default": "PUT",
+                                                "enum": [
+                                                    "PUT"
+                                                ]
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                ]
                             }
                         }
                     }
@@ -376,7 +402,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "sanctum": []
                     }
                 ]
             },
@@ -423,7 +449,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "sanctum": []
                     }
                 ]
             }
@@ -508,7 +534,7 @@
                         "title": "Status",
                         "description": "Status of the profil",
                         "type": "string",
-                        "example": "active"
+                        "example": "actif"
                     },
                     "user_id": {
                         "title": "User ID",
@@ -531,7 +557,9 @@
                 "description": "Request body data for creating or updating a Profil",
                 "required": [
                     "firstname",
-                    "lastname"
+                    "lastname",
+                    "status",
+                    "picture"
                 ],
                 "properties": {
                     "firstname": {
@@ -550,7 +578,12 @@
                         "title": "Status",
                         "description": "The status of the profile",
                         "type": "string",
-                        "example": "active"
+                        "enum": [
+                            "actif",
+                            "inatif",
+                            "en attente"
+                        ],
+                        "example": "actif"
                     },
                     "picture": {
                         "title": "Picture",
@@ -560,6 +593,14 @@
                     }
                 },
                 "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "sanctum": {
+                "type": "apiKey",
+                "description": "Enter token in format (Bearer <token>)",
+                "name": "Authorization",
+                "in": "header"
             }
         }
     },
