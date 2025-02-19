@@ -21,7 +21,7 @@ class UserController extends Controller
             ->where(['status' => ProfilStatusEnum::ACTIF->value])
             ->get();
 
-        return response()->json(['profils' => $profils], Response::HTTP_OK, [], JSON_UNESCAPED_SLASHES);
+        return response()->json(['profils' => $profils]);
     }
 
     /**
@@ -31,7 +31,7 @@ class UserController extends Controller
     {
         $data = $this->getDatas($request);
         $profil = Profil::query()->create($data);
-        return response()->json(['profil' => $profil], Response::HTTP_CREATED, [], JSON_UNESCAPED_SLASHES);
+        return response()->json(['profil' => $profil], Response::HTTP_CREATED);
     }
 
     /**
@@ -52,7 +52,7 @@ class UserController extends Controller
             $user->update($data);
             $user = $user->fresh();
 
-            return response()->json(['profil' => $user], Response::HTTP_OK, [], JSON_UNESCAPED_SLASHES);
+            return response()->json(['profil' => $user]);
         } catch (Exception $exc) {
             Log::error(self::class, ['message' => $exc->getMessage(), 'exc' => $exc]);
             return response()->json(['error' => 'Failed to update Profil.'], Response::HTTP_INTERNAL_SERVER_ERROR);
