@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class LoginRequest extends BaseRequest
 {
     /**
      * Get the validation rules that apply to the request.

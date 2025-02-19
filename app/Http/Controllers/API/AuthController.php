@@ -8,10 +8,10 @@ use App\Http\Requests\RegisterRequest;
 use App\Models\Administrator;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Request;
 
 class AuthController extends Controller implements HasMiddleware
 {
@@ -35,7 +35,7 @@ class AuthController extends Controller implements HasMiddleware
             return response()->json([
                 'message' => 'User created successfully !',
                 'data' => $admin,
-                'token' => $admin->createToken('user' . $admin->id . '-' . now()),
+                'token' => $admin->createToken('user' . $admin->id . '-' . $request->userAgent()),
             ], 201);
         } catch (Exception $exc) {
             return response()->json(['error' => $exc->getMessage()], 500);
@@ -59,15 +59,12 @@ class AuthController extends Controller implements HasMiddleware
         return response()->json([
             'message' => 'User login successfully !',
             'user' => $admin,
-            'token' => $admin->createToken('user' . $admin->id . '-' . now()),
+            'token' => $admin->createToken('user' . $admin->id . '-' . $request->userAgent()),
         ]);
     }
 
     public function logout(Request $request): JsonResponse
     {
-        return response()->json([
-            'json' => $request->user()->currentAccessToken()->id
-        ]);
         // delete just actual sanctum token
         $request->user()->tokens()->delete($request->user()->currentAccessToken()->id);
 
