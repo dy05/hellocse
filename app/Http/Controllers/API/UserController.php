@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Enums\ProfilStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProfilRequest;
 use App\Models\Profil;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,8 +17,11 @@ class UserController extends Controller
      */
     public function index()
     {
-        $profils = Profil::all();
-        return response()->json(['profils' => $profils], Response::HTTP_OK);
+        $profils = Profil::query()
+            ->where(['status' => ProfilStatusEnum::ACTIF->value])
+            ->get();
+
+        return response()->json(['profils' => $profils], Response::HTTP_OK, [], JSON_UNESCAPED_SLASHES);
     }
 
     /**
@@ -26,34 +29,30 @@ class UserController extends Controller
      */
     public function store(ProfilRequest $request)
     {
-        $profil = Profil::query()
-            ->create($request->only([
-                'name'
-            ]));
-
-        return response()->json(['profil' => $profil], Response::HTTP_CREATED);
+        $data = $this->getDatas($request);
+        $profil = Profil::query()->create($data);
+        return response()->json(['profil' => $profil], Response::HTTP_CREATED, [], JSON_UNESCAPED_SLASHES);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Profil $profil)
+    public function show(Profil $user)
     {
-        return response()->json(['profil' => $profil], Response::HTTP_OK);
+        return response()->json(['profil' => $user]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(ProfilRequest $request, Profil $profil)
+    public function update(ProfilRequest $request, Profil $user)
     {
         try {
-            $profil->update($request->only([
-                'name'
-            ]));
-            $profil = $profil->fresh();
+            $data = $this->getDatas($request);
+            $user->update($data);
+            $user = $user->fresh();
 
-            return response()->json(['profil' => $profil], Response::HTTP_OK);
+            return response()->json(['profil' => $user], Response::HTTP_OK, [], JSON_UNESCAPED_SLASHES);
         } catch (Exception $exc) {
             Log::error(self::class, ['message' => $exc->getMessage(), 'exc' => $exc]);
             return response()->json(['error' => 'Failed to update Profil.'], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -63,15 +62,39 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Profil $profil)
+    public function destroy(Profil $user)
     {
         try {
-            $profil->delete();
-
-            return response()->json(null, Response::HTTP_NO_CONTENT);
+            $user->delete();
+            return response()->json(['message' => 'Profil successfully deleted !']);
         } catch (Exception $exc) {
             Log::error(self::class, ['message' => $exc->getMessage(), 'exc' => $exc]);
             return response()->json(['error' => 'Failed to delete Profil.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private function getDatas(ProfilRequest $request)
+    {
+        $data = $request->only([
+            'firstname',
+            'lastname',
+            'status',
+        ]);
+
+        if ($request->method() === 'POST') {
+            $data['user_id'] = $request->input('user_id');
+        }
+
+        if ($request->hasFile('picture')) {
+            $directory = storage_path('app/public/users');
+            if (!is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
+            $picturePath = $request->file('picture')->store('users', 'public');
+            $data['picture'] = $picturePath;
+        }
+
+        return $data;
     }
 }

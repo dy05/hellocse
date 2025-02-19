@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Administrator;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,6 +17,8 @@ return new class extends Migration
             $table->string('lastname');
             $table->string('firstname')->nullable();
             $table->string('picture')->nullable();
+
+            $table->foreignIdFor(Administrator::class, 'user_id')->nullable();
 
             $statuses = getProfilStatuses();
             if (count($statuses) > 0) {

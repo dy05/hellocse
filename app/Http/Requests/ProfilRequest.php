@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ProfilStatusEnum;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 class ProfilRequest extends BaseRequest
@@ -14,10 +15,27 @@ class ProfilRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'firstname' => 'string|max:255',
-            'lastname' => 'string|max:255',
-            'status' => 'string|in:' . join(',', getProfilStatuses()),
-            'image' => 'nullable|image',
+            'firstname' => 'required|string|max:255',
+            'lastname' => 'required|string|max:255',
+            'status' => 'nullable|string|in:' . join(',', getProfilStatuses()),
+            'picture' => 'nullable|image',
         ];
+    }
+
+    protected function passedValidation(): void
+    {
+        if ($this->method() === 'POST') {
+            if (!$this->input('status')) {
+                $this->merge([
+                    'status' => ProfilStatusEnum::INACTIF->value,
+                ]);
+            }
+
+            if ($user = $this->user()) {
+                $this->merge([
+                    'user_id' => $user->id,
+                ]);
+            }
+        }
     }
 }

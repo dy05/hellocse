@@ -22,4 +22,4 @@ Route::get('/users', [UserController::class, 'index']);
 
 Route::apiResource('users', UserController::class)
     ->except('index')
-    ->middleware('auth:sanctum', );
+    ->middleware('auth:sanctum');
