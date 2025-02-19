@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use Alirezasedghi\LaravelImageFaker\ImageFaker;
+use Alirezasedghi\LaravelImageFaker\Services\Picsum;
 use App\Enums\ProfilStatusEnum;
 use Illuminate\Contracts\Validation\ValidationRule;
 
@@ -32,8 +34,9 @@ class ProfilRequest extends BaseRequest
             }
 
             if (!$this->file('picture')) {
+                $imageFaker = new ImageFaker(new Picsum());
                 $this->merge([
-                    'avatar' => fake()->imageUrl(200, 200, 'people'),
+                    'avatar' => $imageFaker->imageUrl(400, 400),
                 ]);
             }
 
