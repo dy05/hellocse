@@ -66,7 +66,9 @@ class AuthController extends Controller implements HasMiddleware
     public function logout(Request $request): JsonResponse
     {
         // delete just actual sanctum token
-        $request->user()->tokens()->delete($request->user()->currentAccessToken()->id);
+        $request->user()->tokens()
+            ->where(['id' => $request->user()->currentAccessToken()->id])
+            ->delete();
 
         return response()->json([
             'message' => 'User logged out successfully !'
