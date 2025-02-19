@@ -32,7 +32,7 @@ class Profil extends Model
 
     public function getPictureAttribute($value): ?string
     {
-        if (str_contains('http://', $value) || str_contains('https://', $value)) {
+        if (str_contains($value, "http://") || str_contains($value, "https://")) {
             return $value;
         }
 

@@ -31,6 +31,12 @@ class ProfilRequest extends BaseRequest
                 ]);
             }
 
+            if (!$this->file('picture')) {
+                $this->merge([
+                    'avatar' => fake()->imageUrl(200, 200, 'people'),
+                ]);
+            }
+
             if ($user = $this->user()) {
                 $this->merge([
                     'user_id' => $user->id,

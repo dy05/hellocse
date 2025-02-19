@@ -93,6 +93,8 @@ class UserController extends Controller
 
             $picturePath = $request->file('picture')->store('users', 'public');
             $data['picture'] = $picturePath;
+        } else if ($request->input('avatar')) {
+            $data['picture'] = $request->input('avatar');
         }
 
         return $data;
