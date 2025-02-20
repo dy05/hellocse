@@ -258,7 +258,13 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {},
+                    {
+                        "sanctum": []
+                    }
+                ]
             },
             "post": {
                 "tags": [
@@ -580,7 +586,7 @@
                         "type": "string",
                         "enum": [
                             "actif",
-                            "inatif",
+                            "inactif",
                             "en attente"
                         ],
                         "example": "actif"

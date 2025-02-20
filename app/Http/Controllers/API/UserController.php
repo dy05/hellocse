@@ -5,9 +5,12 @@ namespace App\Http\Controllers\API;
 use App\Enums\ProfilStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProfilRequest;
+use App\Http\Resources\ProfilResource;
 use App\Models\Profil;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Log;
 use OpenApi\Annotations as OA;
 use Storage;
@@ -30,7 +33,7 @@ class UserController extends Controller
      *     @OA\Response(response=403, description="Unauthorized")
      * )
      */
-    public function user(Request $request)
+    public function user(Request $request): JsonResponse
     {
         return response()->json([
             'user' => $request->user()->load(['profiles'])
@@ -42,6 +45,10 @@ class UserController extends Controller
      *     path="/api/users",
      *     summary="Retrieve a list of active profiles",
      *     tags={"Profiles"},
+     *     security={
+     *         {},
+     *         {"sanctum": {}}
+     *     },
      *     @OA\Response(
      *         response=200,
      *         description="A list of active profiles",
@@ -52,14 +59,28 @@ class UserController extends Controller
      *     )
      * )
      */
-    public function index()
+    public function index(Request $request): JsonResponse
     {
         $profils = Profil::query()
             ->with(['administrator'])
             ->where(['status' => ProfilStatusEnum::ACTIF->value])
             ->get();
 
+        if (!$request->user('api')) {
+            $profils->makeHidden(['status', 'administrator']);
+        }
+
         return response()->json(['profils' => $profils]);
+    }
+
+    public function indexWithResource(): ResourceCollection
+    {
+        $profils = Profil::query()
+            ->with(['administrator'])
+            ->where(['status' => ProfilStatusEnum::ACTIF->value])
+            ->get();
+
+        return ProfilResource::collection($profils);
     }
 
     /**
@@ -84,7 +105,7 @@ class UserController extends Controller
      *     )
      * )
      */
-    public function store(ProfilRequest $request)
+    public function store(ProfilRequest $request): JsonResponse
     {
         $data = $this->getDatas($request);
         $profil = Profil::query()->create($data);
@@ -116,7 +137,7 @@ class UserController extends Controller
      *     )
      * )
      */
-    public function show(Profil $user)
+    public function show(Profil $user): JsonResponse
     {
         $user = $user->load(['administrator']);
         return response()->json(['profil' => $user]);
@@ -172,8 +193,13 @@ class UserController extends Controller
      *     )
      * )
      */
-    public function update(ProfilRequest $request, Profil $user)
+    public function update(ProfilRequest $request, Profil $user): JsonResponse
     {
+        // Can be used to delete profile
+        if ($request->boolean('deleted')) {
+            return $this->destroy($user);
+        }
+
         try {
             $data = $this->getDatas($request);
             $user->update($data);
@@ -217,7 +243,7 @@ class UserController extends Controller
      *     )
      * )
      */
-    public function destroy(Profil $user)
+    public function destroy(Profil $user): JsonResponse
     {
         try {
             $picture = $user->getAttributes()['picture'];

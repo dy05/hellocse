@@ -29,6 +29,10 @@ class Profil extends Model
         'user_id',
     ];
 
+    protected $hidden = [
+        'user_id'
+    ];
+
     public function getPictureAttribute($value): ?string
     {
         if (str_contains($value, "http://") || str_contains($value, "https://")) {

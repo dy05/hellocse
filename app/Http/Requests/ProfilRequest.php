@@ -17,10 +17,11 @@ class ProfilRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'firstname' => 'required|string|max:255',
-            'lastname' => 'required|string|max:255',
+            'firstname' => 'required_without:deleted|string|max:255',
+            'lastname' => 'required_without:deleted|string|max:255',
             'status' => 'nullable|string|in:' . join(',', getProfilStatuses()),
             'picture' => 'nullable|image',
+            'deleted' => 'nullable|boolean',
         ];
     }
 

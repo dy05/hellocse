@@ -42,7 +42,7 @@ class ProfilRequestSchema
      * @OA\Property(
      *     title="Status",
      *     description="The status of the profile",
-     *     enum={"actif", "inatif", "en attente"},
+     *     enum={"actif", "inactif", "en attente"},
      *     example="actif"
      * )
      *
